@@ -1,6 +1,6 @@
 # Test Tool Command
 
-The `test-tool` command provides an interactive interface to test any Kode tool with predefined examples or custom input.
+The `test-tool` command provides an interactive interface to test any Kode tool with predefined examples or custom JSON input. Perfect for testing tool functionality, learning tool schemas, and debugging integrations.
 
 ## Usage
 
@@ -16,32 +16,46 @@ tool-test
 ## Features
 
 ### 🎯 Tool Selection
-- Browse all available tools
-- Navigate with arrow keys
-- See tool names and descriptions
+- Browse all available tools in the system
+- Navigate with arrow keys (↑/↓)
+- See tool names and user-facing descriptions
+- Press 'q' to quit at any time
 
 ### 📋 Predefined Examples
 The command includes ready-to-use test cases for popular tools:
 
-#### JIRA Tool Examples
-- **Get JIRA ticket**: Retrieve ticket details
-- **Create JIRA ticket**: Create a new bug/task/story
-- **Update JIRA ticket**: Modify existing tickets
+#### 🎫 JIRA Tool Examples
+- **Get JIRA ticket**: `{"operation": "get", "ticketKey": "PROJ-123"}`
+  - Retrieve complete ticket details including status, assignee, description
+- **Create JIRA ticket**: `{"operation": "create", "project": "PROJ", "issueType": "Bug", "summary": "Test ticket"}`
+  - Create new bugs, tasks, or stories with full field support
+- **Update JIRA ticket**: `{"operation": "update", "ticketKey": "PROJ-123", "status": "In Progress"}`
+  - Modify existing tickets, change status, update fields
 
-#### Other Tool Examples
-- **File operations**: Read files, list directories
-- **Bash commands**: Execute shell commands
-- **Search operations**: Grep for text patterns
+#### 📁 File Operations
+- **Read files**: `{"file_path": "./package.json"}`
+- **List directories**: Various directory listing options
 
-### ✏️ Custom Input
-- Enter your own JSON input for any tool
-- Real-time JSON validation
-- Schema hints for each tool
+#### 💻 System Commands  
+- **Bash execution**: `{"command": "ls -la"}` or `{"command": "node --version"}`
+- **Safe command testing**: Execute shell commands in controlled environment
 
-### 📊 Results Display
-- Formatted output from tool execution
-- Clear success/error indicators
-- Detailed error messages
+#### 🔍 Search Operations
+- **Grep patterns**: `{"pattern": "import.*React", "path": "./src"}`
+- **Text search**: Find patterns across codebases
+
+### ✏️ Enhanced Custom Input
+- **Visual text input field**: Bordered input area with focus indication
+- **Tool-specific examples**: Contextual JSON examples for each tool
+- **Real-time JSON validation**: Immediate feedback on syntax errors
+- **Smart placeholders**: Auto-generated placeholders based on selected tool
+- **Multi-line support**: Handle complex JSON structures naturally
+
+### 📊 Advanced Results Display
+- **Formatted output**: Tool-specific result formatting
+- **Success indicators**: ✅ Clear success/failure status
+- **Detailed error messages**: Comprehensive error descriptions with context
+- **Interactive results**: Navigate back to continue testing other tools
 
 ## Navigation
 
@@ -56,20 +70,51 @@ The command includes ready-to-use test cases for popular tools:
 - `Esc`: Go back to tool selection
 
 ### Custom Input Mode
-- Type JSON input directly
-- `Enter`: Execute with current input
-- `Esc`: Go back to examples
+- **Type directly**: Use the visual text input field
+- `Enter`: Submit JSON and execute tool
+- `Esc`: Go back to example selection
+- **Smart examples**: See tool-specific JSON examples
+- **Validation**: Immediate feedback on JSON syntax errors
 
 ### Results Screen
 - `Enter` or `Esc`: Return to tool selection
 
-## Example Session
+## Example Sessions
+
+### 🎫 Testing JIRA Tool
 
 1. **Start**: Run `test-tool`
-2. **Select Tool**: Choose "jira" from the list
-3. **Pick Example**: Select "Get JIRA ticket"
-4. **View Results**: See formatted ticket information
-5. **Continue Testing**: Try other tools or examples
+2. **Select Tool**: Navigate to "jira" and press Enter
+3. **Choose Example**: Select "Get JIRA ticket" 
+4. **View Results**: See formatted ticket details:
+   ```
+   ✅ JIRA operation completed
+   JIRA Ticket PROJ-123:
+   Title: Fix login validation
+   Status: In Progress
+   Type: Bug
+   Project: MyProject (PROJ)
+   Priority: High
+   Assignee: John Doe
+   ...
+   ```
+5. **Test Creation**: Try "Create JIRA ticket" example
+6. **Custom Input**: Use custom JSON like:
+   ```json
+   {
+     "operation": "update",
+     "ticketKey": "PROJ-123",
+     "status": "Done",
+     "summary": "Updated title"
+   }
+   ```
+
+### 💻 Testing File Operations
+
+1. **Select**: Choose "file_read" tool
+2. **Custom Input**: Enter `{"file_path": "./package.json"}`
+3. **Results**: View file contents with syntax highlighting
+4. **Try Different**: Test various file paths and options
 
 ## Adding New Examples
 
@@ -89,15 +134,35 @@ const TOOL_TEST_EXAMPLES = {
 }
 ```
 
-## Benefits
+## Benefits & Use Cases
 
-- **Fast Testing**: Quickly verify tool functionality
-- **Learning**: Understand tool input/output formats  
-- **Debugging**: Test edge cases and error conditions
-- **Development**: Validate new tools during development
+### 🚀 **Development & Testing**
+- **Fast iterations**: Quickly test tool changes without full workflows
+- **Schema validation**: Verify tool input/output contracts
+- **Error testing**: Safely test edge cases and error conditions
+- **New tool validation**: Test newly developed tools before integration
 
-The test-tool command is especially useful for:
-- Validating JIRA configuration
-- Testing file operations safely
-- Experimenting with bash commands
-- Learning tool schemas and capabilities
+### 📚 **Learning & Discovery**
+- **Tool exploration**: Discover available tools and their capabilities
+- **Schema understanding**: Learn tool input requirements through examples
+- **API familiarization**: Understand tool responses and formatting
+- **Best practices**: See recommended usage patterns
+
+### 🔧 **Integration & Configuration**
+- **JIRA setup validation**: Test JIRA credentials and connectivity
+- **File system testing**: Verify file access and permissions
+- **Command validation**: Test bash commands in safe environment
+- **Search pattern testing**: Develop and test grep patterns
+
+### 🐛 **Debugging & Troubleshooting**
+- **Isolate issues**: Test tools independently from workflows
+- **Reproduce errors**: Recreate specific error conditions
+- **Validate fixes**: Confirm tool behavior after updates
+- **Performance testing**: Measure tool execution times
+
+The test-tool command is especially valuable for:
+- ✅ **JIRA Integration**: Validate credentials, test operations, debug API issues
+- ✅ **File Operations**: Safe file testing without workflow disruption  
+- ✅ **Command Execution**: Test bash commands before automated execution
+- ✅ **Search & Pattern**: Develop complex grep patterns interactively
+- ✅ **Tool Development**: Validate new tools during development cycle
