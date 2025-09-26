@@ -369,6 +369,9 @@ curl -fsSL https://bun.sh/install | bash
 
 # Windows
 powershell -c "irm bun.sh/install.ps1 | iex"
+
+# Use npm
+npm install -g bun
 ```
 
 ### Setup Development Environment

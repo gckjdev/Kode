@@ -1,0 +1,64 @@
+{
+  "numStartups": 0,
+  "autoUpdaterStatus": "not_configured",
+  "theme": "dark",
+  "preferredNotifChannel": "iterm2",
+  "verbose": false,
+  "primaryProvider": "anthropic",
+  "stream": true,
+  "hasCompletedOnboarding": true,
+  "customApiKeyResponses": {
+    "approved": [],
+    "rejected": []
+  },
+  "modelProfiles": [
+    {
+      "name": "claude-3-5-sonnet",
+      "provider": "anthropic",
+      "apiKey": "your-anthropic-api-key",
+      "maxTokens": 8192,
+      "capabilities": ["text", "vision", "tools"]
+    },
+    {
+      "name": "gpt-4o",
+      "provider": "openai",
+      "apiKey": "your-openai-api-key",
+      "maxTokens": 4096,
+      "capabilities": ["text", "vision", "tools"]
+    }
+  ],
+  "modelPointers": {
+    "main": "claude-3-5-sonnet",
+    "task": "gpt-4o",
+    "reasoning": "claude-3-5-sonnet",
+    "quick": "gpt-4o"
+  },
+  "defaultModelName": "claude-3-5-sonnet",
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/project"],
+      "env": {}
+    }
+  },
+  "jira": {
+    "baseUrl": "https://yourcompany.atlassian.net",
+    "username": "your.email@company.com",
+    "apiToken": "your-jira-api-token-here"
+  },
+  "projects": {
+    "/path/to/your/project": {
+      "allowedTools": ["FileReadTool", "FileEditTool", "BashTool", "JiraTool"],
+      "context": {
+        "projectType": "web-app",
+        "framework": "react"
+      },
+      "contextFiles": ["README.md", "package.json"],
+      "history": [],
+      "enableArchitectTool": false,
+      "mcpContextUris": [],
+      "hasTrustDialogAccepted": true,
+      "hasCompletedProjectOnboarding": true
+    }
+  }
+}

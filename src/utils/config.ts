@@ -173,6 +173,12 @@ export type GlobalConfig = {
   defaultModelName?: string // Default model
   // Update notifications
   lastDismissedUpdateVersion?: string
+  // JIRA integration
+  jira?: {
+    baseUrl: string
+    username: string
+    apiToken: string
+  }
 }
 
 export const DEFAULT_GLOBAL_CONFIG: GlobalConfig = {
