@@ -192,6 +192,24 @@ export type GlobalConfig = {
     }>
     defaultInstance: string
   }
+  // Google Cloud SDK integration
+  gcloud?: {
+    defaultTimeout?: number
+    preferJsonOutput?: boolean
+    showAuthStatus?: boolean
+    workingDirectory?: string
+    environment?: Record<string, string>
+    commandHistory?: {
+      enabled?: boolean
+      maxEntries?: number
+      persistAcrossSessions?: boolean
+    }
+    progressIndicators?: {
+      enabled?: boolean
+      showElapsedTime?: boolean
+      showCancellationHint?: boolean
+    }
+  }
 }
 
 export const DEFAULT_GLOBAL_CONFIG: GlobalConfig = {

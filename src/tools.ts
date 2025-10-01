@@ -20,6 +20,7 @@ import { WebSearchTool } from './tools/WebSearchTool/WebSearchTool'
 import { URLFetcherTool } from './tools/URLFetcherTool/URLFetcherTool'
 import { JiraTool } from './tools/JiraTool/JiraTool'
 import { ConfluenceTool } from './tools/ConfluenceTool/ConfluenceTool'
+import { GCloudTool } from './tools/GCloudTool/GCloudTool'
 import { getMCPTools } from './services/mcpClient'
 import { memoize } from 'lodash-es'
 
@@ -46,6 +47,7 @@ export const getAllTools = (): Tool[] => {
     URLFetcherTool as unknown as Tool,
     JiraTool as unknown as Tool,
     ConfluenceTool as unknown as Tool,
+    GCloudTool as unknown as Tool,
     ...ANT_ONLY_TOOLS,
   ]
 }
