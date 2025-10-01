@@ -179,6 +179,19 @@ export type GlobalConfig = {
     username: string
     apiToken: string
   }
+  // Confluence integration
+  confluence?: {
+    instances: Record<string, {
+      baseUrl: string
+      type: 'cloud' | 'server'
+      email?: string
+      username?: string
+      apiToken?: string
+      timeout?: number
+      maxRetries?: number
+    }>
+    defaultInstance: string
+  }
 }
 
 export const DEFAULT_GLOBAL_CONFIG: GlobalConfig = {
