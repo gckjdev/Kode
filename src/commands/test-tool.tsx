@@ -65,6 +65,20 @@ const TOOL_TEST_EXAMPLES = {
       input: {
         command: 'node --version'
       }
+    },
+    {
+      name: 'Run JiraTool tests (Node.js)',
+      description: 'Execute JiraTool validation tests with Node.js',
+      input: {
+        command: 'node src/tools/JiraTool/test-runner.js'
+      }
+    },
+    {
+      name: 'Run JiraTool tests (Bun)',
+      description: 'Execute JiraTool unit tests with Bun',
+      input: {
+        command: 'bun test src/tools/JiraTool/JiraTool.simple.test.ts'
+      }
     }
   ],
   grep: [
