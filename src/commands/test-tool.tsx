@@ -10,6 +10,46 @@ import { z } from 'zod'
 
 // Example test cases for different tools
 const TOOL_TEST_EXAMPLES = {
+  gcloud: [
+    {
+      name: 'List GCP projects',
+      description: 'List all accessible Google Cloud projects',
+      input: {
+        command: 'projects list',
+        format: 'json'
+      }
+    },
+    {
+      name: 'Get authentication status',
+      description: 'Check current authentication status',
+      input: {
+        command: 'auth list'
+      }
+    },
+    {
+      name: 'List compute instances',
+      description: 'List all compute instances in the current project',
+      input: {
+        command: 'compute instances list',
+        format: 'json'
+      }
+    },
+    {
+      name: 'Get current configuration',
+      description: 'Display current gcloud configuration',
+      input: {
+        command: 'config list'
+      }
+    },
+    {
+      name: 'Run interactive command',
+      description: 'Run a command that may require user interaction',
+      input: {
+        command: 'config set project my-project',
+        interactive: true
+      }
+    }
+  ],
   jira: [
     {
       name: 'Get JIRA ticket',
