@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'bun:test'
+import { z } from 'zod'
 import { JiraTool } from './JiraTool'
 
 describe('JiraTool - Basic Functionality', () => {
@@ -199,7 +200,7 @@ describe('JiraTool - Basic Functionality', () => {
       }
       
       const result = JiraTool.renderResultForAssistant(output)
-      expect(result).toBe('JIRA operation failed: Ticket not found')
+      expect(result).toBe('JIRA operation failed (get): Ticket not found')
     })
 
     it('should render create success result', () => {
@@ -279,7 +280,7 @@ describe('JiraTool - Basic Functionality', () => {
       const schema = JiraTool.inputSchema
       expect(schema).toBeDefined()
       expect(schema._def).toBeDefined()
-      expect(schema._def.typeName).toBe('ZodObject')
+      expect(schema._def.typeName).toBe(z.ZodFirstPartyTypeKind.ZodObject)
     })
   })
 
