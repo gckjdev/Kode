@@ -1,8 +1,10 @@
 import { describe, it, expect } from 'bun:test'
 import { z } from 'zod'
 import { JiraTool } from './JiraTool'
+import { JiraApiClient } from './JiraApiClient'
+import { JiraOperations } from './operations'
 
-describe('JiraTool - Basic Functionality', () => {
+describe('JiraTool', () => {
   describe('Tool Configuration', () => {
     it('should have correct tool properties', () => {
       expect(JiraTool.name).toBe('jira')
@@ -37,7 +39,7 @@ describe('JiraTool - Basic Functionality', () => {
         operation: 'get' as const,
         ticketKey: 'TEST-123'
       }
-      
+
       const result = JiraTool.inputSchema.safeParse(validInput)
       expect(result.success).toBe(true)
       if (result.success) {
@@ -57,7 +59,7 @@ describe('JiraTool - Basic Functionality', () => {
         labels: ['test'],
         components: ['Frontend']
       }
-      
+
       const result = JiraTool.inputSchema.safeParse(validInput)
       expect(result.success).toBe(true)
       if (result.success) {
@@ -76,7 +78,7 @@ describe('JiraTool - Basic Functionality', () => {
         status: 'In Progress',
         customFields: { customfield_10001: 'value' }
       }
-      
+
       const result = JiraTool.inputSchema.safeParse(validInput)
       expect(result.success).toBe(true)
       if (result.success) {
@@ -90,7 +92,7 @@ describe('JiraTool - Basic Functionality', () => {
       const invalidInput = {
         operation: 'invalid'
       }
-      
+
       const result = JiraTool.inputSchema.safeParse(invalidInput)
       expect(result.success).toBe(false)
     })
@@ -99,7 +101,7 @@ describe('JiraTool - Basic Functionality', () => {
       const minimalInput = {
         operation: 'get' as const
       }
-      
+
       const result = JiraTool.inputSchema.safeParse(minimalInput)
       expect(result.success).toBe(true)
     })
@@ -113,7 +115,7 @@ describe('JiraTool - Basic Functionality', () => {
         labels: ['bug', 'urgent', 'frontend'],
         components: ['UI', 'API', 'Database']
       }
-      
+
       const result = JiraTool.inputSchema.safeParse(inputWithArrays)
       expect(result.success).toBe(true)
       if (result.success) {
@@ -126,32 +128,42 @@ describe('JiraTool - Basic Functionality', () => {
   })
 
   describe('Rendering Methods', () => {
-    it('should render tool use message correctly for get operation', () => {
+    it('should render tool use message for get operation', () => {
       const input = { operation: 'get' as const, ticketKey: 'TEST-123' }
-      const message = JiraTool.renderToolUseMessage(input, { verbose: true })
+      const message = JiraTool.renderToolUseMessage(input)
       expect(message).toBe('Getting JIRA ticket TEST-123')
     })
 
-    it('should render tool use message correctly for create operation', () => {
-      const input = { 
-        operation: 'create' as const, 
-        project: 'TEST', 
+    it('should render tool use message for create operation', () => {
+      const input = {
+        operation: 'create' as const,
+        project: 'TEST',
         summary: 'New issue',
         issueType: 'Bug'
       }
-      const message = JiraTool.renderToolUseMessage(input, { verbose: true })
+      const message = JiraTool.renderToolUseMessage(input)
       expect(message).toBe('Creating JIRA ticket in project TEST: New issue')
     })
 
-    it('should render tool use message correctly for update operation', () => {
+    it('should render tool use message for create operation without project', () => {
+      const input = {
+        operation: 'create' as const,
+        summary: 'New issue',
+        issueType: 'Bug'
+      }
+      const message = JiraTool.renderToolUseMessage(input)
+      expect(message).toBe('Creating JIRA ticket: New issue')
+    })
+
+    it('should render tool use message for update operation', () => {
       const input = { operation: 'update' as const, ticketKey: 'TEST-123' }
-      const message = JiraTool.renderToolUseMessage(input, { verbose: true })
+      const message = JiraTool.renderToolUseMessage(input)
       expect(message).toBe('Updating JIRA ticket TEST-123')
     })
 
     it('should render tool use message for unknown operation', () => {
       const input = { operation: 'unknown' as any }
-      const message = JiraTool.renderToolUseMessage(input, { verbose: true })
+      const message = JiraTool.renderToolUseMessage(input)
       expect(message).toBe('Performing JIRA operation: unknown')
     })
 
@@ -181,7 +193,7 @@ describe('JiraTool - Basic Functionality', () => {
         ticket: mockTicket,
         ticketKey: 'TEST-123'
       }
-      
+
       const result = JiraTool.renderResultForAssistant(output)
       expect(result).toContain('JIRA Ticket TEST-123:')
       expect(result).toContain('Title: Test ticket')
@@ -198,7 +210,7 @@ describe('JiraTool - Basic Functionality', () => {
         success: false,
         error: 'Ticket not found'
       }
-      
+
       const result = JiraTool.renderResultForAssistant(output)
       expect(result).toBe('JIRA operation failed (get): Ticket not found')
     })
@@ -209,7 +221,7 @@ describe('JiraTool - Basic Functionality', () => {
         success: true,
         ticketKey: 'TEST-124'
       }
-      
+
       const result = JiraTool.renderResultForAssistant(output)
       expect(result).toBe('Successfully created JIRA ticket: TEST-124')
     })
@@ -220,7 +232,7 @@ describe('JiraTool - Basic Functionality', () => {
         success: true,
         ticketKey: 'TEST-123'
       }
-      
+
       const result = JiraTool.renderResultForAssistant(output)
       expect(result).toBe('Successfully updated JIRA ticket: TEST-123')
     })
@@ -232,7 +244,7 @@ describe('JiraTool - Basic Functionality', () => {
         fields: {
           summary: 'Test ticket',
           status: { name: 'Open', statusCategory: { name: 'To Do' } },
-          assignee: undefined, // No assignee
+          assignee: undefined,
           reporter: { displayName: 'Jane Smith', emailAddress: 'jane@example.com' },
           priority: { name: 'High' },
           issuetype: { name: 'Bug' },
@@ -250,11 +262,30 @@ describe('JiraTool - Basic Functionality', () => {
         ticket: mockTicket,
         ticketKey: 'TEST-123'
       }
-      
+
       const result = JiraTool.renderResultForAssistant(output)
       expect(result).toContain('Assignee: Unassigned')
       expect(result).toContain('Labels: None')
       expect(result).toContain('Components: None')
+    })
+
+    it('should render rejected permission message', () => {
+      const element = JiraTool.renderToolUseRejectedMessage()
+      expect(element).toBeDefined()
+      expect(element.type).toBeDefined()
+    })
+
+    it('should render tool result message component', () => {
+      const output = {
+        operation: 'get',
+        success: true,
+        ticketKey: 'TEST-123',
+        message: 'Test message'
+      }
+
+      const element = JiraTool.renderToolResultMessage(output)
+      expect(element).toBeDefined()
+      expect(element.type).toBeDefined()
     })
   })
 
@@ -284,46 +315,82 @@ describe('JiraTool - Basic Functionality', () => {
     })
   })
 
-  describe('Constitutional Compliance Validation', () => {
-    it('should follow First Principles Engineering', () => {
-      // Tool should have clear, justified structure
-      expect(JiraTool.name).toBe('jira') // Simple, clear naming
-      expect(JiraTool.isReadOnly()).toBe(false) // Correctly identifies as write tool
-      expect(JiraTool.needsPermissions()).toBe(true) // Security-conscious
+  describe('Module Dependencies', () => {
+    it('should import JiraApiClient correctly', () => {
+      expect(JiraApiClient).toBeDefined()
+      expect(typeof JiraApiClient).toBe('function')
     })
 
-    it('should provide Empirical Validation capabilities', () => {
-      // Tool should be testable and observable
+    it('should import JiraOperations correctly', () => {
+      expect(JiraOperations).toBeDefined()
+      expect(typeof JiraOperations).toBe('function')
+    })
+  })
+
+  describe('Error Handling and Validation', () => {
+    it('should handle malformed input gracefully', () => {
+      const malformedInputs = [
+        null,
+        undefined,
+        {},
+        { operation: 'invalid' },
+        { operation: 'get', ticketKey: '' },
+        { operation: 'create', project: '', issueType: '', summary: '' }
+      ]
+
+      malformedInputs.forEach(input => {
+        const result = JiraTool.inputSchema.safeParse(input)
+        if (result.success) {
+          // If parsing succeeds, the data should be reasonable
+          expect(['get', 'create', 'update']).toContain(result.data.operation)
+        }
+      })
+    })
+
+    it('should provide meaningful error messages', () => {
+      const errorOutput = {
+        operation: 'get',
+        success: false,
+        error: 'Configuration error: Missing JIRA credentials'
+      }
+      const result = JiraTool.renderResultForAssistant(errorOutput)
+      expect(result).toContain('failed')
+      expect(result).toContain('Configuration error')
+    })
+  })
+
+  describe('First Principles Engineering Compliance', () => {
+    it('should follow clear naming and structure', () => {
+      expect(JiraTool.name).toBe('jira')
+      expect(JiraTool.userFacingName()).toBe('JIRA')
+      expect(JiraTool.isReadOnly()).toBe(false)
+      expect(JiraTool.needsPermissions()).toBe(true)
+    })
+
+    it('should maintain focused responsibility', () => {
+      const operations = JiraTool.inputSchema.shape.operation._def.values
+      expect(operations).toEqual(['get', 'create', 'update'])
+    })
+
+    it('should provide clear error messages for self-diagnosis', () => {
+      const errorOutput = {
+        operation: 'get',
+        success: false,
+        error: 'JIRA configuration not found. Please configure JIRA settings in your .kode.json file.'
+      }
+      const result = JiraTool.renderResultForAssistant(errorOutput)
+      expect(result).toContain('configuration not found')
+      expect(result).toContain('.kode.json')
+    })
+
+    it('should support empirical validation', () => {
       expect(typeof JiraTool.renderResultForAssistant).toBe('function')
       expect(typeof JiraTool.renderToolResultMessage).toBe('function')
-      
-      // Should provide clear feedback
+
       const errorOutput = { operation: 'test', success: false, error: 'Test error' }
       const result = JiraTool.renderResultForAssistant(errorOutput)
       expect(result).toContain('failed')
       expect(result).toContain('Test error')
-    })
-
-    it('should maintain Simplicity and Minimalism', () => {
-      // Tool should have focused responsibility
-      expect(JiraTool.name).toBe('jira') // Single responsibility
-      expect(JiraTool.userFacingName()).toBe('JIRA') // Clear user interface
-      
-      // Schema should be well-defined but not over-complex
-      const operations = JiraTool.inputSchema.shape.operation._def.values
-      expect(operations).toEqual(['get', 'create', 'update']) // Essential operations only
-    })
-
-    it('should support Autonomous Problem Solving', () => {
-      // Tool should provide clear error messages for self-diagnosis
-      const errorOutput = { 
-        operation: 'get', 
-        success: false, 
-        error: 'JIRA configuration not found. Please configure JIRA settings in your .kode.json file.' 
-      }
-      const result = JiraTool.renderResultForAssistant(errorOutput)
-      expect(result).toContain('configuration not found')
-      expect(result).toContain('.kode.json') // Provides actionable guidance
     })
   })
 })
