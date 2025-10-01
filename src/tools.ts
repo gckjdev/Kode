@@ -19,6 +19,7 @@ import { TodoWriteTool } from './tools/TodoWriteTool/TodoWriteTool'
 import { WebSearchTool } from './tools/WebSearchTool/WebSearchTool'
 import { URLFetcherTool } from './tools/URLFetcherTool/URLFetcherTool'
 import { JiraTool } from './tools/JiraTool/JiraTool'
+import { ConfluenceTool } from './tools/ConfluenceTool/ConfluenceTool'
 import { getMCPTools } from './services/mcpClient'
 import { memoize } from 'lodash-es'
 
@@ -44,6 +45,7 @@ export const getAllTools = (): Tool[] => {
     WebSearchTool as unknown as Tool,
     URLFetcherTool as unknown as Tool,
     JiraTool as unknown as Tool,
+    ConfluenceTool as unknown as Tool,
     ...ANT_ONLY_TOOLS,
   ]
 }

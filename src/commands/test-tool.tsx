@@ -81,6 +81,57 @@ const TOOL_TEST_EXAMPLES = {
       }
     }
   ],
+  confluence: [
+    {
+      name: 'Get Confluence page by ID',
+      description: 'Retrieve a specific Confluence page',
+      input: {
+        operation: 'get',
+        pageId: '123456',
+        expand: ['body.storage', 'version', 'metadata.labels']
+      }
+    },
+    {
+      name: 'Search Confluence content',
+      description: 'Search for content across Confluence',
+      input: {
+        operation: 'search',
+        query: 'project documentation',
+        searchSpace: 'DOCS',
+        limit: 10
+      }
+    },
+    {
+      name: 'List Confluence spaces',
+      description: 'Get all available Confluence spaces',
+      input: {
+        operation: 'spaces',
+        limit: 20
+      }
+    },
+    {
+      name: 'Create Confluence page',
+      description: 'Create a new page in Confluence',
+      input: {
+        operation: 'create',
+        title: 'Test Page from Kode',
+        spaceKey: 'DOCS',
+        content: '<p>This is a test page created from the Kode CLI tool.</p>',
+        labels: ['test', 'kode', 'automation']
+      }
+    },
+    {
+      name: 'List space content',
+      description: 'List all pages in a specific space',
+      input: {
+        operation: 'list',
+        spaceKey: 'DOCS',
+        contentType: 'page',
+        orderBy: 'modified',
+        limit: 15
+      }
+    }
+  ],
   grep: [
     {
       name: 'Search for text',
@@ -261,18 +312,20 @@ const TestTool: React.FC<TestToolProps> = ({ onDone }) => {
         <Text bold color="blue">Custom Input for {selectedTool?.name}</Text>
         <Text>Enter JSON input for the tool (Enter to submit, Esc to go back):</Text>
         <Text></Text>
-        <Text>Example for {selectedTool?.name}:</Text>
-        <Text dimColor>
-          {selectedTool?.name === 'jira' 
-            ? '{"operation": "get", "ticketKey": "PROJ-123"}' 
-            : selectedTool?.name === 'file_read'
-            ? '{"file_path": "./package.json"}'
-            : selectedTool?.name === 'bash'
-            ? '{"command": "ls -la"}'
-            : selectedTool?.name === 'grep'
-            ? '{"pattern": "import.*React", "path": "./src"}'
-            : 'Enter JSON matching the tool schema'
-          }
+            <Text>Example for {selectedTool?.name}:</Text>
+            <Text dimColor>
+              {selectedTool?.name === 'jira'
+                ? '{"operation": "get", "ticketKey": "PROJ-123"}'
+                : selectedTool?.name === 'confluence'
+                ? '{"operation": "search", "query": "documentation", "searchSpace": "DOCS"}'
+                : selectedTool?.name === 'file_read'
+                ? '{"file_path": "./package.json"}'
+                : selectedTool?.name === 'bash'
+                ? '{"command": "ls -la"}'
+                : selectedTool?.name === 'grep'
+                ? '{"pattern": "import.*React", "path": "./src"}'
+                : 'Enter JSON matching the tool schema'
+              }
         </Text>
         <Text></Text>
         <Box borderStyle="round" borderColor="gray" paddingX={1} paddingY={1}>
@@ -281,8 +334,10 @@ const TestTool: React.FC<TestToolProps> = ({ onDone }) => {
             onChange={setCustomInput}
             onSubmit={handleSubmit}
             placeholder={
-              selectedTool?.name === 'jira' 
-                ? '{"operation": "get", "ticketKey": "PROJ-123"}' 
+              selectedTool?.name === 'jira'
+                ? '{"operation": "get", "ticketKey": "PROJ-123"}'
+                : selectedTool?.name === 'confluence'
+                ? '{"operation": "search", "query": "documentation"}'
                 : 'Enter JSON input...'
             }
             focus={true}
